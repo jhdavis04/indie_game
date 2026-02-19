@@ -3,12 +3,17 @@ using UnityEngine.UI;
 
 public class StatMenuUI : MonoBehaviour
 {
-    [Header("Data Connection")]
-    public PlayerState playerState;
+    [Header("Global Connection")]
+    public PlayerState globalState;
+
+    [Header("Active Context")]
+    public CharacterSaveData activeCharacter;
 
     [Header("UI Text Fields")]
+    public Text nameText;
     public Text levelText;
-    public Text hlText;
+    public Text hpText;
+    public Text mpText;
     public Text pointsAvailableText;
 
     [Header("Stat Value Texts")]
@@ -17,34 +22,66 @@ public class StatMenuUI : MonoBehaviour
     public Text agilityText;
     public Text chanceText;
 
-    void OnEnable() => RefreshUI();
+    void OnEnable() 
+    {
+        if (activeCharacter == null && globalState.allCharacters.Count > 0)
+            activeCharacter = globalState.allCharacters[0];
+            
+        RefreshUI();
+    }
+
+    public void SelectCharacter(int index)
+    {
+        if (index >= 0 && index < globalState.allCharacters.Count)
+        {
+            activeCharacter = globalState.allCharacters[index];
+            RefreshUI();
+        }
+    }
 
     public void RefreshUI()
     {
-        levelText.text = $"Level: {playerState.level}";
-        pointsAvailableText.text = $"Points: {playerState.statPointsAvailable}";
+        if (activeCharacter == null) return;
 
-        int maxHL = 100 + (playerState.level * 10);
-        hlText.text = $"HL: {playerState.currentHL} / {maxHL}";
+        nameText.text = $"{activeCharacter.characterName} ({activeCharacter.codename})";
+        levelText.text = $"Level: {activeCharacter.level}";
+        pointsAvailableText.text = $"Stat Points: {activeCharacter.statPointsAvailable}";
 
-        powerText.text = playerState.power.ToString();
-        enduranceText.text = playerState.endurance.ToString();
-        agilityText.text = playerState.agility.ToString();
-        chanceText.text = playerState.chance.ToString();
+        hpText.text = $"HP: {activeCharacter.currentHL} / {activeCharacter.MaxHL}";
+        mpText.text = $"MP: {activeCharacter.currentCL} / {activeCharacter.MaxCL}";
+
+        powerText.text = activeCharacter.power.ToString();
+        enduranceText.text = activeCharacter.endurance.ToString();
+        agilityText.text = activeCharacter.agility.ToString();
+        chanceText.text = activeCharacter.chance.ToString();
     }
 
     public void IncreaseStat(string statName)
     {
-        if (playerState.statPointsAvailable <= 0) return;
+        if (activeCharacter == null || activeCharacter.statPointsAvailable <= 0) return;
+
+        bool statChanged = false;
 
         switch (statName.ToLower())
         {
-            case "power": if (playerState.power < 99) playerState.power++; break;
-            case "endurance": if (playerState.endurance < 99) playerState.endurance++; break;
-            case "agility": if (playerState.agility < 99) playerState.agility++; break;
-            case "chance": if (playerState.chance < 99) playerState.chance++; break;
+            case "power": 
+                if (activeCharacter.power < 99) { activeCharacter.power++; statChanged = true; } 
+                break;
+            case "endurance": 
+                if (activeCharacter.endurance < 99) { activeCharacter.endurance++; statChanged = true; } 
+                break;
+            case "agility": 
+                if (activeCharacter.agility < 99) { activeCharacter.agility++; statChanged = true; } 
+                break;
+            case "chance": 
+                if (activeCharacter.chance < 99) { activeCharacter.chance++; statChanged = true; } 
+                break;
         }
-        playerState.statPointsAvailable--;
-        RefreshUI();
+
+        if (statChanged)
+        {
+            activeCharacter.statPointsAvailable--;
+            RefreshUI();
+        }
     }
 }

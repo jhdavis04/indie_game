@@ -1,21 +1,37 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "NewPlayerState", menuName = "RPG/Player State")]
+[CreateAssetMenu(fileName = "PlayerState", menuName = "RPG/Player State")]
 public class PlayerState : ScriptableObject
 {
-    public int level = 1;
-    public int statPointsAvailable;
-    public int currentHL;
+    [Header("Shared Economy")]
+    public int gold;
+    public int tokens;
 
-    public int power = 10, endurance = 10, agility = 10, chance = 10;
+    [Header("The Party")]
+    public List<CharacterSaveData> allCharacters;
+    public List<CharacterSaveData> activeParty;
 
-    public List<MoveData> equippedMoves = new List<MoveData>(new MoveData[6]);
-    public List<MoveData> unlockedPool = new List<MoveData>();
+    [Header("Shared Inventory")]
+    public List<ItemData> inventory;
 
-    public void EquipMove(MoveData move, int slot)
+    [Header("Global Progression")]
+    public int storyChapter;
+    public List<string> completedQuestIDs;
+
+    #region Helper Methods
+    public CharacterSaveData GetCharacter(string name)
     {
-        if (equippedMoves.Contains(move)) equippedMoves[equippedMoves.IndexOf(move)] = null;
-        equippedMoves[slot] = move;
+        return allCharacters.Find(c => c.characterName == name);
     }
+
+    public void RecruitCharacter(CharacterSaveData newMember)
+    {
+        if (!allCharacters.Contains(newMember))
+        {
+            allCharacters.Add(newMember);
+        }
+    }
+    #endregion
+
 }

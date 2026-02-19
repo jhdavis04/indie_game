@@ -4,11 +4,12 @@ using UnityEngine;
 public class ElementalAttackMove : MoveData
 {
     public int baseDamage;
-    public override void Execute(BaseCharacter user, BaseCharacter target, TypeChart chart, int rank)
+    public override void Execute(BaseCharacter attacker, BaseCharacter target, TypeChart chart, float multiplier)
     {
-        float mult = chart.GetMultiplier(moveElement, target.data.type);
-        int stat = scalingStat == StatType.Power ? user.GetEffectiveAttack() : user.GetEffectiveLuck();
-        int dmg = Mathf.RoundToInt((baseDamage + (stat * multiplier)) * mult);
-        target.TakeDamage(dmg);
+        Debug.Log($"{attacker.characterName} used {moveName} on {target.characterName}!");
+        int power = attacker.GetEffectiveAttack();
+        float typeMod = chart.GetMultiplier(moveElement, target.enemyData != null ? target.enemyData.type : ElementType.Neutral);
+        int damage = Mathf.RoundToInt((baseDamage + power) * typeMod * multiplier);
+        target.TakeDamage(damage);
     }
 }

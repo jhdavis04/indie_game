@@ -6,6 +6,7 @@ public class EnemyData : ScriptableObject
 {
     public string characterName;
     public ElementType type;
+    public int level = 1;
 
     [Header("Base Stats (1-99)")]
     public int basePower;

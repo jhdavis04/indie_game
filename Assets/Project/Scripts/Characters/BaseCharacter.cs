@@ -3,62 +3,81 @@ using System.Collections.Generic;
 
 public class BaseCharacter : MonoBehaviour 
 {
-    [Header("Data")]
-    public EnemyData data;
-    public PlayerState saveState;
+    [Header("Identity")]
+    public string characterName;
     public bool isPlayer;
 
-    [Header("Battle Stats")]
+    [Header("Data Links")]
+    public EnemyData enemyData;         
+    public CharacterSaveData characterSave;
+
+    [Header("Live Battle Stats")]
     public int level;
-    public int currentHL;
+    public int currentHL; // Changed from currentHP
+    public int currentCL; // Changed from currentMP
+    
     public int Power, Endurance, Agility, Chance;
 
-    [Header("Battle Stages")]
+    [Header("Battle Modifiers (Stages)")]
     public int attackStage, defenseStage, speedStage, luckStage;
     public List<StatusEffect> activeStatuses = new List<StatusEffect>();
 
-    public void Initialize(EnemyData info, bool playerSide)
+    public void Initialize(bool playerSide, CharacterSaveData partyData = null, EnemyData eData = null)
     {
-        data = info; isPlayer = playerSide;
-        if (isPlayer && saveState != null)
+        isPlayer = playerSide;
+
+        if (isPlayer && partyData != null)
         {
-            Power = saveState.power;
-            Endurance = saveState.endurance;
-            Agility = saveState.agility;
-            Chance = saveState.chance;
-            currentHL = saveState.currentHL;
-            if (currentHL <= 0) currentHL = GetMaxHL();
-        } else
+            characterSave = partyData;
+            characterName = partyData.characterName;
+            
+            Power = partyData.power;
+            Endurance = partyData.endurance;
+            Agility = partyData.agility;
+            Chance = partyData.chance;
+            level = partyData.level;
+
+            // Matching names here
+            currentHL = partyData.currentHL;
+            currentCL = partyData.currentCL;
+        } 
+        else if (eData != null)
         {
-            Power = data.basePower;
-            Endurance = data.baseEndurance;
-            Agility = data.baseAgility;
-            Chance = data.baseChance;
-            currentHL = GetMaxHL();
+            enemyData = eData;
+            characterName = eData.characterName;
+            
+            Power = eData.basePower;
+            Endurance = eData.baseEndurance;
+            Agility = eData.baseAgility;
+            Chance = eData.baseChance;
+            level = eData.level;
+
+            currentHL = GetMaxHL(); // Updated to HL
+            currentCL = GetMaxCL(); // Updated to CL
         }
+
         ResetStages();
     }
 
-    #region Health & Mitigation Logic
-    public int GetMaxHL() => 100 + (level * 10);
+    #region Health & Charge Logic
+    // Renamed these to HL and CL for consistency
+    public int GetMaxHL() => 100 + (Endurance * 10) + (level * 5);
+    public int GetMaxCL() => 20 + (level * 2) + (Chance * 5);
 
     public void TakeDamage(int rawDmg)
     {
         int mitigation = GetEffectiveDefense() / 2;
         int finalDmg = Mathf.Max(1, rawDmg - mitigation);
 
-        currentHL = Mathf.Max(0, currentHL - finalDmg);
-        Debug.Log($"{data.characterName} took {finalDmg} damage! (Mitigated {mitigation})");
+        currentHL = Mathf.Max(0, currentHL - finalDmg); // Updated to HL
+        Debug.Log($"{characterName} took {finalDmg} damage! (Mitigated {mitigation})");
     }
     #endregion
 
-    #region BattleCalculationMath
+    #region Stat Stage Math
     public void ResetStages()
     {
-        attackStage = 0;
-        defenseStage = 0;
-        speedStage = 0;
-        luckStage = 0;
+        attackStage = 0; defenseStage = 0; speedStage = 0; luckStage = 0;
     }
 
     private float GetStageMult(int stage)
@@ -76,9 +95,13 @@ public class BaseCharacter : MonoBehaviour
 
     public void SyncToSave()
     {
-        if (isPlayer && saveState != null)
+        if (isPlayer && characterSave != null)
         {
-            saveState.currentHL = currentHL;
+            // Now currentHL and currentCL are recognized!
+            characterSave.currentHL = Mathf.Clamp(currentHL, 0, GetMaxHL());
+            characterSave.currentCL = Mathf.Clamp(currentCL, 0, GetMaxCL());
+            
+            Debug.Log($"{characterSave.characterName} synced to save file.");
         }
     }
 }
