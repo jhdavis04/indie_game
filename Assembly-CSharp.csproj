@@ -51,13 +51,20 @@
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Moves\ElementalAttackMove.cs" />
     <Compile Include="Assets\Project\Scripts\Systems\BattleManager.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\MoveTooltip.cs" />
     <Compile Include="Assets\Project\Scripts\Statuses\StatusEffects.cs" />
     <Compile Include="Assets\Project\Scripts\Characters\BaseCharacter.cs" />
     <Compile Include="Assets\Project\Scripts\Characters\PlayerState.cs" />
     <Compile Include="Assets\Project\Scripts\Core\TypeChart.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\SkillTreeConnector.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\TooltipTrigger.cs" />
+    <Compile Include="Assets\Project\Scripts\Moves\SkillNode.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\StatMenuUI.cs" />
     <Compile Include="Assets\Project\Scripts\Core\RPGDefinitions.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\SkillTreeUI.cs" />
     <Compile Include="Assets\Project\Scripts\Characters\EnemyData.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\LoadoutUI.cs" />
     <Compile Include="Assets\Project\Scripts\Moves\MoveData.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ public class PlayerState : ScriptableObject
     public int power = 10, endurance = 10, agility = 10, chance = 10;
 
     public List<MoveData> equippedMoves = new List<MoveData>(new MoveData[6]);
-    public List<MoveData> unlockedMoves = new List<MoveData>();
+    public List<MoveData> unlockedPool = new List<MoveData>();
 
     public void EquipMove(MoveData move, int slot)
     {
